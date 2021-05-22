@@ -62,7 +62,7 @@ def draw_strokes(strokes, window, width, height):
     f.close()
 
 # window settings
-image = MyImage(Image.open('rsz_image.png').convert('RGB'))
+image = MyImage(Image.open('AppleSVG.png').convert('RGB'))
 width, height = image.getSize()
 canvas = MyImage(Image.new('RGB', image.getSize(), (255,255,255)))
 window = pygame.display.set_mode(image.getSize())
