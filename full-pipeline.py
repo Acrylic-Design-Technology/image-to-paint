@@ -12,8 +12,10 @@ gcode_compiler.append_curves(curves)
 gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/lauren3_OUTPUT_63.gcode', passes=1)
 
 file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/lauren3_OUTPUT_63.gcode'  # put your filename here
-paintbrush_len = 20 # paintbrush len in cm
-angle = 45 # angle of paintbrush to page
+# paintbrush_len = 146 # paintbrush len in mm
+# angle = 45 # angle of paintbrush to page
+
+offset_len = 156.75 # hardcoded variable calc for above 2
 
 with open(file_name, 'r+') as f:
     new_code = ""
@@ -22,6 +24,7 @@ with open(file_name, 'r+') as f:
 
     for line in content:
         if 'G1' in line:
+            # retrieve all XY pairs from GCode for manipulation
             gcode = line.strip('\n')
             gcode = gcode.replace(';','')
             coordinate_set = {}
@@ -37,15 +40,27 @@ with open(file_name, 'r+') as f:
             if i < len(coordinates) - 1:
                 gcode = line.replace('\n','')
                 gcode = gcode.replace(';','')
+
+                # parameters to calculate angle of each brush stroke
                 x_0 = coordinates[i].get('X')
                 y_0 = coordinates[i].get('Y')
                 x_1 = coordinates[i+1].get('X')
                 y_1 = coordinates[i+1].get('Y')
                 i = i + 1
-                if x_1 - x_0 == 0:
+                
+                # 4 edge cases (straight lines)
+                if x_1 == x_0 & y_1 > y_0:
                     pz = 0
-                else:
-                    pz = math.atan((y_1-y_0)/(x_1-x_0)) * 156.75
+                elif x_1 == x_0 & y_1 < y_0:
+                    pz = math.pi * offset_len
+                elif y_1 == y_0 & x_1 > x_0:
+                    pz = (math.pi / 2) * offset_len
+                elif y_1 == y_0 & x_1 > x_0:
+                    pz = ((3 * math.pi) / 2) * offset_len
+                else: # general angle calc
+                    pz = math.atan((y_1-y_0)/(x_1-x_0)) * offset_len
+                
+                # Add Gcode to 
                 new_code += gcode + ' Z' + str(pz) + ';' + '\n'
             else:
                 new_code += gcode + '\n'
@@ -54,6 +69,7 @@ with open(file_name, 'r+') as f:
             gcode = line.strip('\n')
             new_code += gcode + '\n'
 
+    # write Gcode to new file
     print(new_code)
     f.seek(0)
     f.write(new_code)
