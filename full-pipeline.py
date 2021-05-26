@@ -6,12 +6,12 @@ from svg_to_gcode.compiler import Compiler, interfaces
 # how far down the tool moves after every pass. Set it to 0 if your machine does not support Z axis movement.
 gcode_compiler = Compiler(interfaces.Gcode, movement_speed=5000, cutting_speed=1500, pass_depth=0)
 
-curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/lauren3_OUTPUT_63.svg') # Parse an svg file into geometric curves
+curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/EyeballSVG.svg') # Parse an svg file into geometric curves
 
 gcode_compiler.append_curves(curves) 
-gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/lauren3_OUTPUT_63.gcode', passes=1)
+gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/EyeballSVG.gcode', passes=1)
 
-file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/lauren3_OUTPUT_63.gcode'  # put your filename here
+file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/EyeballSVG.gcode'  # put your filename here
 # paintbrush_len = 146 # paintbrush len in mm
 # angle = 45 # angle of paintbrush to page
 
@@ -48,20 +48,64 @@ with open(file_name, 'r+') as f:
                 y_1 = coordinates[i+1].get('Y')
                 i = i + 1
                 
-                # 4 edge cases (straight lines)
-                if x_1 == x_0 & y_1 > y_0:
+
+                base_angle = math.atan(abs((y_1-y_0))/abs((x_1-x_0)))
+                # 4 edge cases (straight lines) and 4 quadrant calculations
+                if (x_1 == x_0) & (y_1 < y_0):
                     pz = 0
-                elif x_1 == x_0 & y_1 < y_0:
+                elif (x_1 == x_0) & (y_1 > y_0):
                     pz = math.pi * offset_len
-                elif y_1 == y_0 & x_1 > x_0:
+                elif (y_1 == y_0) & (x_1 < x_0):
                     pz = (math.pi / 2) * offset_len
-                elif y_1 == y_0 & x_1 > x_0:
+                elif (y_1 == y_0) & (x_1 > x_0):
                     pz = ((3 * math.pi) / 2) * offset_len
-                else: # general angle calc
-                    pz = math.atan((y_1-y_0)/(x_1-x_0)) * offset_len
+                elif (x_1 > x_0) & (y_1 > y_0): # general angle calc q1
+                    pz = (((3 * math.pi) / 2) - base_angle) * offset_len
+                elif (x_1 < x_0) & (y_1 > y_0): # general angle calc q2
+                    pz = ((math.pi / 2) + base_angle) * offset_len
+                elif (x_1 < x_0) & (y_1 < y_0): # general angle calc q3
+                    pz = ((math.pi / 2) - base_angle) * offset_len
+                else: # general angle calc q4
+                    pz = (((3 * math.pi) / 2) + base_angle) * offset_len
                 
-                # Add Gcode to 
-                new_code += gcode + ' Z' + str(pz) + ';' + '\n'
+                # 4 straight lines and then 4 quadrant movement
+                if (x_1 == x_0) & (y_1 > y_0):
+                    y_0 += offset_len
+                    y_1 +=  offset_len
+                elif (x_1 == x_0) & (y_1 < y_0):
+                    y_0 -= offset_len
+                    y_1 -=  offset_len
+                elif (y_1 == y_0) & (x_1 > x_0):
+                    x_0 += offset_len
+                    x_1 += offset_len
+                elif (y_1 == y_0) & (x_1 > x_0):
+                    x_0 -= offset_len
+                    x_1 -= offset_len
+                elif (x_1 > x_0) & (y_1 > y_0): # general offset calc q1
+                    x_0 += math.cos(base_angle) * offset_len
+                    x_1 += math.cos(base_angle) * offset_len
+                    y_0 += math.sin(base_angle) * offset_len
+                    y_1 += math.sin(base_angle) * offset_len
+                elif (x_1 < x_0) & (y_1 > y_0): # general offset calc q2
+                    x_0 -= math.cos(base_angle) * offset_len
+                    x_1 -= math.cos(base_angle) * offset_len
+                    y_0 += math.sin(base_angle) * offset_len
+                    y_1 += math.sin(base_angle) * offset_len
+                elif (x_1 < x_0) & (y_1 < y_0): # general offset calc q3
+                    x_0 -= math.cos(base_angle) * offset_len
+                    x_1 -= math.cos(base_angle) * offset_len
+                    y_0 -= math.sin(base_angle) * offset_len
+                    y_1 -= math.sin(base_angle) * offset_len
+                else: # general offset calc q4
+                    x_0 += math.cos(base_angle) * offset_len
+                    x_1 += math.cos(base_angle) * offset_len
+                    y_0 -= math.sin(base_angle) * offset_len
+                    y_1 -= math.sin(base_angle) * offset_len
+
+                # Add Gcode to new file
+                # new_code += gcode + ' Z' + str(pz) + ';' + '\n'
+                new_code += 'G1 X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ' Z' + str(pz) + ';' + '\n'
+                new_code += 'G1 X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ' Z' + str(pz) + ';' + '\n'
             else:
                 new_code += gcode + '\n'
             
