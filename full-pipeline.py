@@ -1,17 +1,21 @@
 import math
 from svg_to_gcode.svg_parser import parse_file
 from svg_to_gcode.compiler import Compiler, interfaces
+from svg_to_gcode import TOLERANCES
+TOLERANCES['approximation'] = 0.9
 
 # Instantiate a compiler, specifying the interface type and the speed at which the tool should move. pass_depth controls
 # how far down the tool moves after every pass. Set it to 0 if your machine does not support Z axis movement.
+'''
 gcode_compiler = Compiler(interfaces.Gcode, movement_speed=5000, cutting_speed=1500, pass_depth=0)
 
-curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/EyeballSVG.svg') # Parse an svg file into geometric curves
+curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.svg') # Parse an svg file into geometric curves
 
 gcode_compiler.append_curves(curves) 
-gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/EyeballSVG.gcode', passes=1)
+gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.gcode', passes=1)
+'''
 
-file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/EyeballSVG.gcode'  # put your filename here
+file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/line_manual.gcode'  # put your filename here
 # paintbrush_len = 146 # paintbrush len in mm
 # angle = 45 # angle of paintbrush to page
 
@@ -48,8 +52,8 @@ with open(file_name, 'r+') as f:
                 y_1 = coordinates[i+1].get('Y')
                 i = i + 1
                 
-
-                base_angle = math.atan(abs((y_1-y_0))/abs((x_1-x_0)))
+                if (x_1 != x_0):
+                    base_angle = math.atan(abs((y_1-y_0))/abs((x_1-x_0)))
                 # 4 edge cases (straight lines) and 4 quadrant calculations
                 if (x_1 == x_0) & (y_1 < y_0):
                     pz = 0
@@ -104,10 +108,13 @@ with open(file_name, 'r+') as f:
 
                 # Add Gcode to new file
                 # new_code += gcode + ' Z' + str(pz) + ';' + '\n'
-                new_code += 'G1 X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ' Z' + str(pz) + ';' + '\n'
-                new_code += 'G1 X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ' Z' + str(pz) + ';' + '\n'
+                new_code += 'G1 X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
+                new_code += 'G1 A' + str(pz) + ';' + '\n'
+                new_code += 'G1 Z' + '32' + ';' + '\n'
+                new_code += 'G1 X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
+                new_code += 'G1 Z' + '0' + ';' + '\n'
             else:
-                new_code += gcode + '\n'
+                print("done")
             
         else:
             gcode = line.strip('\n')
