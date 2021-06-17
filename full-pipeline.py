@@ -15,7 +15,7 @@ gcode_compiler.append_curves(curves)
 gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.gcode', passes=1)
 '''
 
-file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/line_manual.gcode'  # put your filename here
+file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/joey_drawn_new.gcode'  # put your filename here
 # paintbrush_len = 146 # paintbrush len in mm
 # angle = 45 # angle of paintbrush to page
 
@@ -108,8 +108,8 @@ with open(file_name, 'r+') as f:
 
                 # Add Gcode to new file
                 # new_code += gcode + ' Z' + str(pz) + ';' + '\n'
-                new_code += 'G1 X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
-                new_code += 'G1 A' + str(pz) + ';' + '\n'
+                new_code += 'G1 F1500' + ' X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
+                new_code += 'G1 F5000' + ' A' + str(pz) + ';' + '\n'
                 new_code += 'G1 Z' + '32' + ';' + '\n'
                 new_code += 'G1 X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
                 new_code += 'G1 Z' + '0' + ';' + '\n'
