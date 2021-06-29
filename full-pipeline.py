@@ -112,7 +112,7 @@ with open(file_name, 'r+') as f:
                 new_code += 'G1 F6500' + ' A' + str(pz) + ';' + '\n'
                 new_code += 'G1 F250' + ' Z' + '10' + ';' + '\n'
                 new_code += 'G1 F6500' + ' X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
-                new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n'
+                new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n' + '\n'
             else:
                 print("done")
             
