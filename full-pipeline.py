@@ -15,11 +15,11 @@ gcode_compiler.append_curves(curves)
 gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.gcode', passes=1)
 '''
 
-file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/joey_drawn_new.gcode'  # put your filename here
+file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/hype.gcode'  # put your filename here
 # paintbrush_len = 146 # paintbrush len in mm
 # angle = 45 # angle of paintbrush to page
 
-offset_len = 156.75 # hardcoded variable calc for above 2
+offset_len = 84.175  # hardcoded variable calc for above 2
 
 with open(file_name, 'r+') as f:
     new_code = ""
@@ -82,7 +82,7 @@ with open(file_name, 'r+') as f:
                 elif (y_1 == y_0) & (x_1 > x_0):
                     x_0 += offset_len
                     x_1 += offset_len
-                elif (y_1 == y_0) & (x_1 > x_0):
+                elif (y_1 == y_0) & (x_1 < x_0):
                     x_0 -= offset_len
                     x_1 -= offset_len
                 elif (x_1 > x_0) & (y_1 > y_0): # general offset calc q1
@@ -108,11 +108,11 @@ with open(file_name, 'r+') as f:
 
                 # Add Gcode to new file
                 # new_code += gcode + ' Z' + str(pz) + ';' + '\n'
-                new_code += 'G1 F1500' + ' X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
-                new_code += 'G1 F5000' + ' A' + str(pz) + ';' + '\n'
-                new_code += 'G1 Z' + '32' + ';' + '\n'
-                new_code += 'G1 X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
-                new_code += 'G1 Z' + '0' + ';' + '\n'
+                new_code += 'G1 F6500' + ' X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
+                new_code += 'G1 F6500' + ' A' + str(pz) + ';' + '\n'
+                new_code += 'G1 F250' + ' Z' + '10' + ';' + '\n'
+                new_code += 'G1 F6500' + ' X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
+                new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n'
             else:
                 print("done")
             
