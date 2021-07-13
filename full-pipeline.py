@@ -8,14 +8,12 @@ TOLERANCES['approximation'] = 0.9
 # how far down the tool moves after every pass. Set it to 0 if your machine does not support Z axis movement.
 '''
 gcode_compiler = Compiler(interfaces.Gcode, movement_speed=5000, cutting_speed=1500, pass_depth=0)
-
 curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.svg') # Parse an svg file into geometric curves
-
 gcode_compiler.append_curves(curves) 
 gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.gcode', passes=1)
 '''
 
-file_name = 'C:/Users/12269/Documents/GitHub/image-to-paint/hype.gcode'  # put your filename here
+file_name = '/Users/lynn/Downloads/Test - Triforce.gcode'  # put your filename here
 # paintbrush_len = 146 # paintbrush len in mm
 # angle = 45 # angle of paintbrush to page
 
@@ -38,7 +36,8 @@ with open(file_name, 'r+') as f:
             coordinates.append(coordinate_set)
 
     i = 0
-    for line in content:
+    j=0;
+    for line in content:   
         if 'G1' in line:
             gcode = line.strip('\n')
             if i < len(coordinates) - 1:
@@ -105,20 +104,35 @@ with open(file_name, 'r+') as f:
                     x_1 += math.cos(base_angle) * offset_len
                     y_0 -= math.sin(base_angle) * offset_len
                     y_1 -= math.sin(base_angle) * offset_len
+                    
 
                 # Add Gcode to new file
                 # new_code += gcode + ' Z' + str(pz) + ';' + '\n'
-                new_code += 'G1 F6500' + ' X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
-                new_code += 'G1 F6500' + ' A' + str(pz) + ';' + '\n'
-                new_code += 'G1 F250' + ' Z' + '10' + ';' + '\n'
-                new_code += 'G1 F6500' + ' X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
-                new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n' + '\n'
-            else:
-                print("done")
-            
+                if j+1<=len(content):
+                    if 'done' in content[j+1]:
+                        new_code += 'G1 F6500' + ' X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
+                        new_code += 'G1 F6500' + ' A' + str(pz) + ';' + '\n'
+                        #new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n'
+                        #new_code += 'G1 F6500' + ' X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
+                        #new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n' + '\n'
+                        
+                    else:
+                        new_code += 'G1 F6500' + ' X' + str(round(x_0, 5)) + ' Y' + str(round(y_0, 5)) + ';' + '\n'
+                        new_code += 'G1 F6500' + ' A' + str(pz) + ';' + '\n'
+                        new_code += 'G1 F250' + ' Z' + '10' + ';' + '\n'
+                        new_code += 'G1 F6500' + ' X' + str(round(x_1, 5)) + ' Y' + str(round(y_1, 5)) + ';' + '\n'
+                        new_code += 'G1 F250' + ' Z' + '0' + ';' + '\n' + '\n'
+                    
+                
+            #else:
+                #print("done")
+           
+        elif 'done' in line:
+            print(" ")
         else:
             gcode = line.strip('\n')
             new_code += gcode + '\n'
+        j=j+1
 
     # write Gcode to new file
     print(new_code)
