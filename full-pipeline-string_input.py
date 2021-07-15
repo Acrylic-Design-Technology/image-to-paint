@@ -1,32 +1,37 @@
+import json
 import math
 from svg_to_gcode.svg_parser import parse_file
 from svg_to_gcode.compiler import Compiler, interfaces
 from svg_to_gcode import TOLERANCES
 TOLERANCES['approximation'] = 0.9
 
-# Instantiate a compiler, specifying the interface type and the speed at which the tool should move. pass_depth controls
-# how far down the tool moves after every pass. Set it to 0 if your machine does not support Z axis movement.
-'''
-gcode_compiler = Compiler(interfaces.Gcode, movement_speed=5000, cutting_speed=1500, pass_depth=0)
-curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.svg') # Parse an svg file into geometric curves
-gcode_compiler.append_curves(curves) 
-gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.gcode', passes=1)
-'''
 
-gcode_string = ""
+def lambda_handler(event, context):
 
-file_name = '/Users/lynn/Downloads/Test - Triforce.gcode'  # put your filename here
-# paintbrush_len = 146 # paintbrush len in mm
-# angle = 45 # angle of paintbrush to page
-
-offset_len = 84.175  # hardcoded variable calc for above 2
-
-with open(file_name, 'r+') as f:
+    # Instantiate a compiler, specifying the interface type and the speed at which the tool should move. pass_depth controls
+    # how far down the tool moves after every pass. Set it to 0 if your machine does not support Z axis movement.
+    '''
+    gcode_compiler = Compiler(interfaces.Gcode, movement_speed=5000, cutting_speed=1500, pass_depth=0)
+    curves = parse_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.svg') # Parse an svg file into geometric curves
+    gcode_compiler.append_curves(curves) 
+    gcode_compiler.compile_to_file('C:/Users/12269/Documents/GitHub/image-to-paint/star_manual.gcode', passes=1)
+    '''
+    
+    gcode_string = event['body']
+    
+    #file_name =   # put your filename here
+    # paintbrush_len = 146 # paintbrush len in mm
+    # angle = 45 # angle of paintbrush to page
+    
+    offset_len = 84.175  # hardcoded variable calc for above 2
+    
+    #with open(file_name, 'r+') as f:
     new_code = ""
     coordinates = []
+    
     # content = f.readlines()
     content = gcode_string.split('\n')
-
+    
     for line in content:
         if 'G1' in line:
             # retrieve all XY pairs from GCode for manipulation
@@ -137,6 +142,17 @@ with open(file_name, 'r+') as f:
         j=j+1
 
     # write Gcode to new file
-    print(new_code)
-    f.seek(0)
-    f.write(new_code)
+    #print(new_code)
+    #f.seek(0)
+    #f.write(new_code)
+        
+    return {
+        'statusCode': 200,
+        'headers': {
+        #'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': 'https://acrylicpainter.netlify.app'
+        #'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        },
+        'body': json.dumps(new_code)
+    
+    }
