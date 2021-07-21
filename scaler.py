@@ -1,10 +1,11 @@
 import math
 
-file_name = 'C:/Users/12269/Downloads/gcode/test.gcode'  # put your filename here
+file_name = 'C:/Users/12269/Downloads/gcode/shark.gcode'  # put your filename here
 # paintbrush_len = 146 # paintbrush len in mm
 # angle = 45 # angle of paintbrush to page
 
-scale_rate = 0.59823215423  # hardcoded variable calc for above 2
+scale_rate_x = 0.67777777777  # hardcoded variable calc for above 2
+scale_rate_y = 0.77065767285
 
 with open(file_name, 'r+') as f:
     new_code = ""
@@ -31,8 +32,8 @@ with open(file_name, 'r+') as f:
                 gcode = gcode.replace(';','')
 
                 # parameters to calculate angle of each brush stroke
-                x = (coordinates[i].get('X') * scale_rate)
-                y = (coordinates[i].get('Y') * scale_rate)
+                x = (coordinates[i].get('X') * scale_rate_x)
+                y = (coordinates[i].get('Y') * scale_rate_y)
                 i = i + 1
 
                 # Add Gcode to new file
